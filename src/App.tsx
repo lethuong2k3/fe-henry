@@ -1,16 +1,45 @@
-import { ThemeProvider } from "@/components/theme-provider"
+import { ThemeProvider } from "@/contexts/theme-provider"
 import { BrowserRouter, Route, Routes } from "react-router-dom"
-import { publicRouters } from "./routers/routers"
+import { privateRouters, publicRouters } from "./routers/routers"
+import { AuthProvider } from "./contexts/auth-context"
+import PrivateRoute from "./routers/private-route"
+import { PublicRoute } from "./routers/public-route"
+import LoginPage from "./pages/login"
+import AdminLayout from "./pages/admin"
+import { Toaster } from "sonner"
 
 function App() {
   return (
      <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
         <BrowserRouter>
-          <Routes>
-            {publicRouters.map((item, index) => {
-              return <Route path={item.path} element={<item.components />} key={index} />
-            })}
-          </Routes>
+          <Toaster position="top-right" />
+          <AuthProvider>
+              <Routes>
+                <Route path="/login" element={
+                  <PublicRoute>
+                    <LoginPage />
+                  </PublicRoute>
+                } />
+                {publicRouters.map((item, index) => {
+                  return <Route path={item.path} element={<item.components />} key={index} />
+                })}
+                <Route
+                element={
+                  <PrivateRoute>
+                      <AdminLayout />
+                  </PrivateRoute>
+                }
+              >
+                {privateRouters.map((item, index) => (
+                  <Route
+                    path={item.path}
+                    element={<item.components />}
+                    key={index}
+                  />
+                ))}
+              </Route>
+            </Routes>
+          </AuthProvider>
         </BrowserRouter>
     </ThemeProvider>
   )

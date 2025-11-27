@@ -18,10 +18,10 @@ export default function NavigationHeader() {
     const {t} = useTranslation()
     const isMobile = useIsMobile()
     return (
-        <div className="flex justify-between font-[600] ml-[20px] mr-[20px]">
-            <Link to={"/"} className="flex justify-center items-center gap-2">
+        <div className="flex justify-between font-[700] ml-[20px] mr-[20px]">
+            <Link to={"/"} className="flex justify-center items-center gap-3">
                 <img src={Logo} className=" w-[80px] h-[60px]" />
-                <p className="uppercase text-[22px]" style={{color: '#4CC36F'}}>uncle henry</p>
+                <p className="uppercase text-[22px] text-[#4CC36F]">uncle henry</p>
             </Link>
             <NavigationMenu viewport={isMobile}>
                 <NavigationMenuList>
@@ -30,7 +30,7 @@ export default function NavigationHeader() {
                             <Link to={'/'}>{t('home')}</Link>
                         </NavigationMenuLink>
                     </NavigationMenuItem>
-                    <NavigationMenuItem className="hidden md:block">
+                    <NavigationMenuItem className="hidden md:block z-1">
                         <NavigationMenuTrigger><Link to={'/#'}>{t('ielts_courses')}</Link></NavigationMenuTrigger>
                         <NavigationMenuContent>
                             <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>

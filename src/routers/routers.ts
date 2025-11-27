@@ -1,15 +1,26 @@
 import { lazy } from 'react'
 
-interface PublicRoute {
+interface RouteProps {
     path: string
     components: React.LazyExoticComponent<React.ComponentType<any>>
 }
 
-const publicRouters: PublicRoute[] = [
+const publicRouters: RouteProps[] = [
     {
         path: "/",
-        components: lazy(() => import("@/pages/HomePage/HomePage"))
+        components: lazy(() => import("@/pages/user/home-page"))
+    },
+]
+
+const privateRouters: RouteProps[] = [
+    {
+         path: "/dashboard",
+         components: lazy(() => import("@/pages/admin/DashBoard"))
+    },
+     {
+         path: "/blogs",
+         components: lazy(() => import("@/pages/admin/Blog"))
     }
 ]
 
-export {publicRouters}
+export {publicRouters, privateRouters}

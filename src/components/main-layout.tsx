@@ -7,7 +7,7 @@ type MainLayoutProps = {
 export default function MainLayout({children, ...params}: MainLayoutProps) {
     return (
         <main className="flex justify-center" {...params}>
-            <div className="w-[1260px] md:w-full">
+            <div className="w-[1260px]">
                 {children}
             </div>
         </main>
