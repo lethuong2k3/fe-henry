@@ -13,16 +13,20 @@ const loginApi = async (
     email,
     password,
   });
-
   Cookies.set("token", res.data.token);
   Cookies.set("refreshToken", res.data.refreshToken);
   return res.data;
 };
+
+const signOut = async () => {
+  const res = await API.post('/api/auth/logout');
+  return res.data;
+}
 
 const infoAPI = async (): Promise<InfoResponse> => {
   const res = await API.get<InfoResponse>("/api/auth/info");
   return res.data;
 }
 
-export { loginApi, infoAPI};
+export { loginApi, infoAPI, signOut};
 

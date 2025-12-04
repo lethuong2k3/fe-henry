@@ -25,7 +25,7 @@ API.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 403 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
         const res = await axios.post<RefreshResponse>(
@@ -37,7 +37,7 @@ API.interceptors.response.use(
         );
 
         Cookies.set("token", res.data.token);
-        Cookies.set("token", res.data.refreshToken);
+        Cookies.set("refreshToken", res.data.refreshToken);
 
         originalRequest.headers.Authorization = `Bearer ${res.data.token}`;
 

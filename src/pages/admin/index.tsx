@@ -1,4 +1,4 @@
-import { AppSidebar } from "@/components/admin/app-sidebar"
+import { AppSidebar } from "@/components/admin/sidebar/app-sidebar"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -13,9 +13,12 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { Outlet } from "react-router-dom"
+import { Outlet, Link } from "react-router-dom"
+import { useBreadcrumbs } from "@/hooks/useBreadcrumbs"
 
 export default function AdminLayout() {
+  const breadcrumbs = useBreadcrumbs()
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -29,21 +32,27 @@ export default function AdminLayout() {
             />
             <Breadcrumb>
               <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">
-                    Building Your Application
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-                </BreadcrumbItem>
+                {breadcrumbs.map((item, index) => (
+                  <BreadcrumbItem key={index}>
+                    {!item.isLast ? (
+                      <>
+                        <BreadcrumbLink asChild>
+                          <Link to={item.to}>{item.label}</Link>
+                        </BreadcrumbLink>
+                        <BreadcrumbSeparator />
+                      </>
+                    ) : (
+                      <BreadcrumbPage>{item.label}</BreadcrumbPage>
+                    )}
+                  </BreadcrumbItem>
+                ))}
               </BreadcrumbList>
             </Breadcrumb>
           </div>
         </header>
+
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-            <Outlet />
+          <Outlet />
         </div>
       </SidebarInset>
     </SidebarProvider>

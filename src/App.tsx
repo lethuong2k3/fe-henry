@@ -7,13 +7,17 @@ import { PublicRoute } from "./routers/public-route"
 import LoginPage from "./pages/login"
 import AdminLayout from "./pages/admin"
 import { Toaster } from "sonner"
+import { LayoutProvider } from "./contexts/layout-provider"
 
 function App() {
   return (
      <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
         <BrowserRouter>
+          
           <Toaster position="top-right" />
           <AuthProvider>
+              <LayoutProvider>
+
               <Routes>
                 <Route path="/login" element={
                   <PublicRoute>
@@ -39,6 +43,7 @@ function App() {
                 ))}
               </Route>
             </Routes>
+              </LayoutProvider>
           </AuthProvider>
         </BrowserRouter>
     </ThemeProvider>

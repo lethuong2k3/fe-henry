@@ -18,7 +18,7 @@ const privateRouters: RouteProps[] = [
          components: lazy(() => import("@/pages/admin/DashBoard"))
     },
      {
-         path: "/blogs",
+         path: "/admin-blogs",
          components: lazy(() => import("@/pages/admin/Blog"))
     }
 ]
