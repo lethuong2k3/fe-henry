@@ -1,9 +1,8 @@
-import { showSubmittedData } from '@/lib/show-submitted-data'
-import { ConfirmDialog } from '@/components/confirm-dialog'
+  import { ConfirmDialog } from '@/components/confirm-dialog'
 import { TasksMutateDrawer } from './tasks-mutate-drawer'
 import { useTasks } from '@/contexts/task-provider'
 
-export function TasksDialogs() {
+export function TasksDialogs({onSuccess }: {onSuccess?: () => void}) {
   const { open, setOpen, currentRow, setCurrentRow } = useTasks()
   return (
     <>
@@ -11,6 +10,7 @@ export function TasksDialogs() {
         key='task-create'
         open={open === 'create'}
         onOpenChange={() => setOpen('create')}
+        onSuccess={onSuccess}
       />
 
       {currentRow && (
@@ -25,6 +25,7 @@ export function TasksDialogs() {
               }, 500)
             }}
             currentRow={currentRow}
+            onSuccess={onSuccess}
           />
 
           <ConfirmDialog
@@ -42,10 +43,6 @@ export function TasksDialogs() {
               setTimeout(() => {
                 setCurrentRow(null)
               }, 500)
-              showSubmittedData(
-                currentRow,
-                'The following task has been deleted:'
-              )
             }}
             className='max-w-md'
             title={`Delete this task: ${currentRow.id} ?`}

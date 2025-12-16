@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import useDialogState from '@/hooks/use-dialog-state'
-import { type Blog } from '@/pages/admin/Blog/data/schema'
+import type { Blog } from '@/interfaces/blog'
 
 type TasksDialogType = 'create' | 'update' | 'delete' | 'import'
 

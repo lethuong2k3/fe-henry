@@ -1,14 +1,14 @@
 'use client'
 
-import { z } from 'zod'
+import { set, z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useState, useEffect, useRef } from 'react'
-
 import { Button } from '@/components/ui/button'
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -26,24 +26,28 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 import { SelectDropdown } from '@/components/select-dropdown'
-import { Textarea } from '@/components/ui/textarea'
-import { showSubmittedData } from '@/lib/show-submitted-data'
 
 import { Upload, ImageIcon, XIcon } from 'lucide-react'
 import Tiptap from '@/components/admin/tiptap'
+import { uploadImage } from '@/service/cloud-service'
+import { Spinner } from '@/components/ui/spinner'
+import { createBlog, updateBlog } from '@/service/blog-service'
+import { toast } from 'sonner'
+import moment from 'moment'
 
 type TaskMutateDrawerProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   currentRow?: any
+  onSuccess?: () => void
 }
 
 const formSchema = z.object({
   title: z.string().min(1, 'Title is required.'),
   description: z.string(),
-  imageUrl: z.string().optional(),
+  imageUrl: z.string(),
   status: z.string().min(1, 'Please select a status.'),
-  active: z.string().min(1, 'Please select a status.')
+  active: z.string().min(1, 'Please select a active.')
 })
 type TaskForm = z.infer<typeof formSchema>
 
@@ -51,6 +55,7 @@ export function TasksMutateDrawer({
   open,
   onOpenChange,
   currentRow,
+  onSuccess,
 }: TaskMutateDrawerProps) {
 
   const [preview, setPreview] = useState<string | null>(null)
@@ -65,7 +70,7 @@ export function TasksMutateDrawer({
       description: '',
       imageUrl: '',
       status: '1',
-      active: '',
+      active: '0',
     },
   })
 
@@ -75,44 +80,88 @@ export function TasksMutateDrawer({
     if (url) setPreview(url)
   }, [form.watch("imageUrl")])
 
-  // 🔥 Hàm upload file (thay API bằng backend của bạn)
-  const uploadImage = async (file: File) => {
-    setIsUploading(true)
-
-    const formData = new FormData()
-    formData.append("file", file)
-
-    // Ví dụ API upload
-    const res = await fetch("/api/upload", {
-      method: "POST",
-      body: formData
-    })
-
-    const data = await res.json()
-    setIsUploading(false)
-
-    return data.url // backend trả về {url: "..."}
+  const resetForm = () => {
+    form.reset()
+    setFile(null)
+    setPreview(null)
+    onOpenChange(false)
   }
 
   const onSubmit = async (data: TaskForm) => {
     let finalImageUrl = data.imageUrl
-
-    // Nếu có upload file → upload trước khi submit form
+    setIsUploading(true)
     if (file) {
-      const url = await uploadImage(file)
-      finalImageUrl = url
+       const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+      if (!validTypes.includes(file.type)) {
+          form.setError("imageUrl", {
+            type: "manual",
+            message: "File must be an image (jpg, png, webp, gif)"
+          })
+          return;
+      }
+        try {
+          const url = await uploadImage(file)
+          finalImageUrl = url;
+        } catch {
+          console.log("Upload image failed")
+          setIsUploading(false)
+          return;
+        }   
     }
 
-    const finalData = {
-      ...data,
-      imageUrl: finalImageUrl
+    if (!finalImageUrl) {
+      form.setError("imageUrl", {
+        type: "manual",
+        message: "Image is required."
+      })
+      return;
+    }
+  const isValidUrl = /^https?:\/\/.+/i.test(finalImageUrl)
+    if (!isValidUrl) {
+      form.setError("imageUrl", {
+        type: "manual",
+        message: "Image URL is not valid."
+      })
+      return
     }
 
-    showSubmittedData(finalData)
-    onOpenChange(false)
-    form.reset()
-    setFile(null)
-    setPreview(null)
+   try {
+    if (currentRow?.id) {
+      // 🔥 UPDATE
+      await updateBlog(currentRow.id, {
+        ...data,
+        imageUrl: finalImageUrl,
+      }).then(() => {
+        toast.success("Blog updated successfully")
+        setIsUploading(false)
+        onSuccess?.() 
+        resetForm()
+      }).catch(err => {
+        setIsUploading(false)
+        toast.error(err.response.data)
+        console.log(err)
+      })
+    } else {
+      // 🔥 CREATE
+      await createBlog({
+        ...data,
+        imageUrl: finalImageUrl,
+      }).then(() => {
+        toast.success("Blog created successfully")
+        setIsUploading(false)
+        onSuccess?.() 
+        resetForm()
+      }).catch(err => {
+        setIsUploading(false)
+        toast.error(err.response.data)
+        console.log(err)
+      })
+    }
+
+  } catch (err) {
+    console.error(err)
+    toast.error("Save failed")
+  }
   }
 
   return (
@@ -125,7 +174,7 @@ export function TasksMutateDrawer({
         setFile(null)
       }}
     >
-      <SheetContent className="flex flex-col lg:w-[600px] lg:max-w-[600px]">
+      <SheetContent className="flex flex-col w-[100%] lg:w-[800px] lg:max-w-[800px] xl:w-[700px] xl:max-w-[700px]">
         <SheetHeader className="text-start">
           <SheetTitle>{currentRow ? "Update" : "Create"} Blog</SheetTitle>
           <SheetDescription>
@@ -137,7 +186,7 @@ export function TasksMutateDrawer({
           <form
             id="tasks-form"
             onSubmit={form.handleSubmit(onSubmit)}
-            className="flex-1 space-y-6 overflow-y-auto px-4"
+            className="flex-1 space-y-6 overflow-y-auto px-3"
           >
             {/* ----- Title ----- */}
             <FormField
@@ -250,11 +299,12 @@ export function TasksMutateDrawer({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Description</FormLabel>
-                  <FormControl>
+                  <FormControl className='w-full'>
                     <Tiptap value={field.value || ''} onChange={field.onChange} />
                   </FormControl>
                 </FormItem>
               )}
+              
             />
             {/* ----- Status ----- */}
             <FormField
@@ -299,7 +349,38 @@ export function TasksMutateDrawer({
                 </FormItem>
               )}
             />
-
+            {currentRow && (
+              <>         
+              <FormItem>
+                <FormLabel>Created At</FormLabel>
+                <FormDescription>
+                  {moment(currentRow.createdAt).format('YYYY-MM-DD, h:mm:ss a')}
+                </FormDescription>
+              </FormItem>
+               <FormItem>
+                <FormLabel>Created By</FormLabel>
+                <FormDescription>
+                  {currentRow.createdBy}
+                </FormDescription>
+              </FormItem>
+              {currentRow.updatedAt && (
+                <FormItem>
+                <FormLabel>Updated At</FormLabel>
+                <FormDescription>
+                  {moment(currentRow.updatedAt).format('YYYY-MM-DD, h:mm:ss a')}
+                </FormDescription>
+              </FormItem>
+              )}
+              {currentRow.updatedBy && (
+                <FormItem>
+                <FormLabel>Updated By</FormLabel>
+                <FormDescription>
+                  {currentRow.updatedBy}
+                </FormDescription>
+              </FormItem>
+              )}
+              </>
+            )}
           </form>
         </Form>
 
@@ -308,7 +389,7 @@ export function TasksMutateDrawer({
             <Button variant="outline">Close</Button>
           </SheetClose>
           <Button type="submit" form="tasks-form" disabled={isUploading}>
-            {isUploading ? "Uploading..." : "Save changes"}
+            {isUploading ? <><Spinner /> Saving...</> : "Save changes"}
           </Button>
         </SheetFooter>
       </SheetContent>

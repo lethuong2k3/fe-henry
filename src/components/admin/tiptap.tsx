@@ -31,7 +31,7 @@ const MenuBar = ({ editor }: any) => {
   return (
     <div className="mb-2 flex gap-2">
 
-      <AiAskButton />   {/* Không truyền editor */}
+      <AiAskButton  editor={editor} />   {/* Không truyền editor */}
 
       <HeadingDropdownMenu
         editor={editor}
