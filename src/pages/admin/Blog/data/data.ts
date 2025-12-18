@@ -20,7 +20,7 @@ export const actives = [
     icon: BadgeCheck,
   },
   {
-    label: 'No Active',
+    label: 'Inactive',
     value: '0' as const,
     icon: BadgeX,
   },

@@ -1,5 +1,4 @@
 import { useIsMobile } from "@/hooks/use-mobile"
-import { useTranslation } from "react-i18next"
 import { 
     NavigationMenu, 
     NavigationMenuContent, 
@@ -12,10 +11,8 @@ import {
 import { ModeToggle } from "./mode-toggle"
 import { Link } from "react-router-dom"
 import Logo from "@/assets/logo-henry.png"
-import LanguagesSelect from "./languages-select"
 
 export default function NavigationHeader() {
-    const {t} = useTranslation()
     const isMobile = useIsMobile()
     return (
         <div className="flex justify-between font-[700] ml-[20px] mr-[20px]">
@@ -27,43 +24,42 @@ export default function NavigationHeader() {
                 <NavigationMenuList>
                     <NavigationMenuItem>
                         <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                            <Link to={'/'}>{t('home')}</Link>
+                            <Link to={'/'}>Trang chủ</Link>
                         </NavigationMenuLink>
                     </NavigationMenuItem>
                     <NavigationMenuItem className="hidden md:block z-1">
-                        <NavigationMenuTrigger><Link to={'/#'}>{t('ielts_courses')}</Link></NavigationMenuTrigger>
+                        <NavigationMenuTrigger><Link to={'/#'}>Khóa học IELTS</Link></NavigationMenuTrigger>
                         <NavigationMenuContent>
                             <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                                <Link to={'/#'}>{t('writing_essays_marking')}</Link>
+                                <Link to={'/#'}>Gói chấm bài Writing</Link>
                             </NavigationMenuLink>
                         </NavigationMenuContent>
                     </NavigationMenuItem>
                     <NavigationMenuItem>
                         <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                            <Link to={'/#'}>{t('hall_of_fame')}</Link>
+                            <Link to={'/#'}>Hall of fame</Link>
                         </NavigationMenuLink>
                     </NavigationMenuItem>
                     <NavigationMenuItem>
                         <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                            <Link to={'/#'}>{t('ielts_writing')}</Link>
+                            <Link to={'/#'}>IELTS Writing</Link>
                         </NavigationMenuLink>
                     </NavigationMenuItem>
                     <NavigationMenuItem>
                         <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                            <Link to={'/#'}>{t('ielts_reading')}</Link>
+                            <Link to={'/#'}>IELTS Reading</Link>
                         </NavigationMenuLink>
                     </NavigationMenuItem>
                     <NavigationMenuItem>
                         <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                            <Link to={'/#'}>{t('ielts_listening')}</Link>
+                            <Link to={'/#'}>IELTS Listening</Link>
                         </NavigationMenuLink>
                     </NavigationMenuItem>
                     <NavigationMenuItem>
                         <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                            <Link to={'/#'}>{t('ielts_speaking')}</Link>
+                            <Link to={'/#'}>IELTS Speaking</Link>
                         </NavigationMenuLink>
                     </NavigationMenuItem>
-                    <LanguagesSelect />
                     <ModeToggle />
                 </NavigationMenuList>
         </NavigationMenu>

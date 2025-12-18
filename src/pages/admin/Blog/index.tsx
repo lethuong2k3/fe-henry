@@ -67,6 +67,7 @@ export default function Blogs() {
                     setStatusValue={setStatusValue}
                     activeValue={activeValue}
                     setActiveValue={setActiveValue}
+                    onSuccess={fetchData}
                 />
             </Main>
             <TasksDialogs onSuccess={fetchData} />

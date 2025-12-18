@@ -38,48 +38,30 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Spinner } from "@/components/ui/spinner"
 import { useTasks } from "@/contexts/task-provider"
 import { Badge } from "@/components/ui/badge"
+import { DataTableBulkActions } from './data-table-bulk-actions'
+import { actives, statuses } from "../data/data"
 
-
-const statuses = [
-  {
-    value: '1',
-    label: "In Progress",
-  },
-  {
-    value: "0",
-    label: "Canceled",
-  },
-]
-
-const actives = [
-    {
-    value: 'true',
-    label: "Active",
-  },
-  {
-    value: "false",
-    label: "No active",
-  },
-]
 
 export const columns: ColumnDef<Blog>[] = [
-  {
-    id: "select",
+    {
+    id: 'select',
     header: ({ table }) => (
       <Checkbox
         checked={
           table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
+          (table.getIsSomePageRowsSelected() && 'indeterminate')
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
+        aria-label='Select all'
+        className='translate-y-[2px]'
       />
     ),
     cell: ({ row }) => (
       <Checkbox
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
+        aria-label='Select row'
+        className='translate-y-[2px]'
       />
     ),
     enableSorting: false,
@@ -130,7 +112,7 @@ export const columns: ColumnDef<Blog>[] = [
           Active
         </Badge>
         ) : (
-          <Badge variant="destructive"><CircleX />No active</Badge>
+          <Badge variant="destructive"><CircleX />Inactive</Badge>
         )}
         </div>
     ),
@@ -179,7 +161,10 @@ export const columns: ColumnDef<Blog>[] = [
             >
               <Eye /> View
             </DropdownMenuItem>
-            <DropdownMenuItem><Trash /> Delete</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => {
+              setCurrentRow(block)
+              setOpen('delete')
+            }}><Trash /> Delete</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       )
@@ -202,6 +187,7 @@ type TaskTableProps = {
     setStatusValue: (v: string) => void
     activeValue: string
     setActiveValue: (v: string) => void
+    onSuccess?: () => void
 }
 
 export function TaskTable(
@@ -217,13 +203,14 @@ export function TaskTable(
     setStatusValue, 
     activeValue, 
     setActiveValue,
+    onSuccess,
   }: TaskTableProps
 ) {
 
   const [openStatus, setOpenStatus] = React.useState(false);    
   const [openActive, setOpenActive] = React.useState(false);
   const PAGE_SIZES = [10, 20, 50]
- 
+  
   const table = useReactTable({
     data,
     columns,
@@ -511,6 +498,7 @@ export function TaskTable(
           </Pagination>
         </div>
       </div>
+      <DataTableBulkActions table={table} onSuccess={onSuccess} />
     </div>
   )
 }
